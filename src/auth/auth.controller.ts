@@ -1,4 +1,13 @@
-import { Controller, Post, Req, Request, Res, UseGuards } from '@nestjs/common';
+import {
+	Controller,
+	HttpException,
+	HttpStatus,
+	Post,
+	Req,
+	Request,
+	Res,
+	UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -19,6 +28,13 @@ export class AuthController {
 	async logout(@Req() req, @Res({ passthrough: true }) res: Response) {
 		req.session.destroy();
 		return 'logout';
+	}
+
+	@Post('check-user')
+	async checkToken(@Request() req) {
+		if (!req.user)
+			throw new HttpException('Not authorized', HttpStatus.NOT_FOUND);
+		return req.user;
 	}
 
 	@UseGuards(AuthenticatedGuard)

@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { indexes, searchInContents } from 'src/common/utils';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateFileDto } from './dto/create-file.dto';
 import { UpdateFileDto } from './dto/update-file.dto';
 import { File } from './entities/file.entity';
+const fs = require('fs');
+const path = require('path');
 
 @Injectable()
 export class FilesService {
@@ -40,5 +43,27 @@ export class FilesService {
 	async remove(id: number) {
 		const file = await this.findOne(id);
 		return await this.fileRepository.remove(file);
+	}
+
+	async search(search: string, level: number) {
+		const filteredFiles = await this.fileRepository
+			.createQueryBuilder('file')
+			.where('file.level <= :level', {
+				level: level,
+			})
+			.getMany();
+
+		let results = await Promise.all(
+			filteredFiles.map(async (file) => {
+				const item: any = {};
+				Object.assign(item, file);
+				const result = await searchInContents(search, file.path);
+				item.ocurrences = result.length;
+				return item;
+			}),
+		);
+		results = results.filter((item: any) => item.ocurrences > 0);
+
+		return results;
 	}
 }

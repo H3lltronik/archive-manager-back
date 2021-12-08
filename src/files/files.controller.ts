@@ -11,6 +11,7 @@ import {
 	Req,
 	Request,
 	UseGuards,
+	Query,
 } from '@nestjs/common';
 import { FilesService } from './files.service';
 import { CreateFileDto } from './dto/create-file.dto';
@@ -36,6 +37,14 @@ export class FilesController {
 	@Post()
 	create(@Request() req, @Body() createFileDto: CreateFileDto) {
 		return this.filesService.create(createFileDto, req.user);
+	}
+
+	@UseGuards(AuthenticatedGuard)
+	@Get('search')
+	search(@Request() req, @Query('search') search: string) {
+		console.log('search', search);
+		// if (search.length <= 0) return this.filesService.findAll();
+		return this.filesService.search(search, req.user.level);
 	}
 
 	@Get()
