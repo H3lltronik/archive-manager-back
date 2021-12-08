@@ -9,6 +9,18 @@ import * as passport from 'passport';
 async function bootstrap() {
 	const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+	app.use(
+		session({
+			secret: 'aaa',
+			resave: false,
+			saveUninitialized: false,
+			cookie: { maxAge: 360000 },
+		}),
+	);
+
+	app.use(passport.initialize());
+	app.use(passport.session());
+
 	app.use(cookieParser());
 	app.useStaticAssets(join(__dirname, '..', '..', 'public'), {
 		setHeaders: (res, path, stat) => {

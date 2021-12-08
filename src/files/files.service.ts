@@ -1,26 +1,40 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/user/entities/user.entity';
+import { Repository } from 'typeorm';
 import { CreateFileDto } from './dto/create-file.dto';
 import { UpdateFileDto } from './dto/update-file.dto';
+import { File } from './entities/file.entity';
 
 @Injectable()
 export class FilesService {
-	create(createFileDto: CreateFileDto) {
-		return 'This action adds a new file';
+	constructor(
+		@InjectRepository(File)
+		private fileRepository: Repository<File>,
+		@InjectRepository(User)
+		private userRepository: Repository<User>,
+	) {}
+
+	async create(createFileDto: CreateFileDto) {
+		console.log('createFileDto', createFileDto);
+		const file = this.fileRepository.create({
+			filename: createFileDto.filename,
+			level: createFileDto.level,
+			path: createFileDto.path,
+		});
+		return await this.fileRepository.save(file);
 	}
 
-	findAll() {
-		return `This action returns all files`;
+	async findAll() {
+		return await this.fileRepository.find();
 	}
 
-	findOne(id: number) {
-		return `This action returns a #${id} file`;
+	async findOne(id: number) {
+		return await this.fileRepository.findOne(id);
 	}
 
-	update(id: number, updateFileDto: UpdateFileDto) {
-		return `This action updates a #${id} file`;
-	}
-
-	remove(id: number) {
-		return `This action removes a #${id} file`;
+	async remove(id: number) {
+		const file = await this.findOne(id);
+		return await this.fileRepository.remove(file);
 	}
 }

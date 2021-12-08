@@ -13,7 +13,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
-
 @Controller('user')
 export class UserController {
 	constructor(private userService: UserService) {}
@@ -26,6 +25,6 @@ export class UserController {
 
 	@Post('change-password')
 	changePassword(@Body() updateDto: UpdateUserDto) {
-		return this.userService.update(1, updateDto);
+		return 'not implemented';
 	}
 }

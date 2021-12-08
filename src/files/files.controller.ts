@@ -36,11 +36,6 @@ export class FilesController {
 		return this.filesService.findOne(+id);
 	}
 
-	@Patch(':id')
-	update(@Param('id') id: string, @Body() updateFileDto: UpdateFileDto) {
-		return this.filesService.update(+id, updateFileDto);
-	}
-
 	@Delete(':id')
 	remove(@Param('id') id: string) {
 		return this.filesService.remove(+id);
@@ -52,6 +47,6 @@ export class FilesController {
 		const filename = req.file.path;
 		const filenamePath = `${req.file.destination}${req.file.filename}`;
 
-		return 'ok';
+		return file;
 	}
 }
