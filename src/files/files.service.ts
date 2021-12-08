@@ -48,6 +48,7 @@ export class FilesService {
 	async search(search: string, level: number) {
 		const filteredFiles = await this.fileRepository
 			.createQueryBuilder('file')
+			.leftJoinAndSelect('file.user', 'user')
 			.where('file.level <= :level', {
 				level: level,
 			})
@@ -57,7 +58,10 @@ export class FilesService {
 			filteredFiles.map(async (file) => {
 				const item: any = {};
 				Object.assign(item, file);
-				const result = await searchInContents(search, file.path);
+				const result = await searchInContents(
+					search,
+					`public/${file.path}`,
+				);
 				item.ocurrences = result.length;
 				return item;
 			}),
