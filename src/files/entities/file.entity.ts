@@ -21,6 +21,12 @@ export class File {
 	@Column()
 	level: number;
 
+	@Column()
+	size: number;
+
+	@Column()
+	mimetype: string;
+
 	@ManyToOne(() => User, (user) => user.files, {
 		eager: true,
 	})

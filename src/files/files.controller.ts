@@ -27,6 +27,11 @@ const fs = require('fs');
 export class FilesController {
 	constructor(private readonly filesService: FilesService) {}
 
+	@Get('download')
+	download() {
+		return this.filesService.findAll();
+	}
+
 	@UseGuards(AuthenticatedGuard)
 	@Post()
 	create(@Request() req, @Body() createFileDto: CreateFileDto) {

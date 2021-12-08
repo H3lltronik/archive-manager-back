@@ -19,8 +19,10 @@ export class FilesService {
 		const foundUser = await this.userRepository.findOne(user);
 		const file = this.fileRepository.create({
 			filename: createFileDto.filename,
-			level: createFileDto.level,
+			level: user.level,
 			path: createFileDto.path,
+			mimetype: createFileDto.mimetype,
+			size: createFileDto.size,
 			user: foundUser,
 		});
 		return await this.fileRepository.save(file);

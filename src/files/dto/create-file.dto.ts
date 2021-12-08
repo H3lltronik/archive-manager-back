@@ -9,4 +9,10 @@ export class CreateFileDto {
 
 	@IsNotEmpty()
 	level: number;
+
+	@IsNotEmpty()
+	mimetype: string;
+
+	@IsNotEmpty()
+	size: number;
 }
