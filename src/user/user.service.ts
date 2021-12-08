@@ -5,12 +5,15 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
+import { File } from 'src/files/entities/file.entity';
 
 @Injectable()
 export class UserService {
 	constructor(
 		@InjectRepository(User)
 		private userRepository: Repository<User>,
+		@InjectRepository(File)
+		private fileRepository: Repository<File>,
 	) {}
 
 	async create(dto: CreateUserDto) {
@@ -21,6 +24,7 @@ export class UserService {
 			username: dto.username,
 			password: hashedPass,
 			name: dto.name,
+			level: 3,
 		});
 
 		const { password, ...savedUser } = await this.userRepository.save(user);
@@ -55,11 +59,15 @@ export class UserService {
 		return user;
 	}
 
-	async addFile(id: number) {
-		const user = await this.userRepository.findOne(id);
-		if (!user) {
+	async addFile(id: number, user: User) {
+		const file = await this.fileRepository.findOne(id);
+		console.log('aber', user, file);
+		if (!file || !user) {
 			throw new HttpException('', HttpStatus.NOT_FOUND);
 		}
-		return user;
+
+		file.user = user;
+
+		return await this.fileRepository.save(file);
 	}
 }

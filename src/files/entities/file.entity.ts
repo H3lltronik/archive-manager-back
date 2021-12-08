@@ -1,5 +1,11 @@
 import { User } from 'src/user/entities/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+	Column,
+	Entity,
+	JoinColumn,
+	ManyToOne,
+	PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('file')
 export class File {
@@ -15,6 +21,9 @@ export class File {
 	@Column()
 	level: number;
 
-	@ManyToOne(() => User, (user) => user.files)
+	@ManyToOne(() => User, (user) => user.files, {
+		eager: true,
+	})
+	@JoinColumn()
 	user: User;
 }

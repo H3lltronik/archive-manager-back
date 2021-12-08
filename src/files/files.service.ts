@@ -15,12 +15,13 @@ export class FilesService {
 		private userRepository: Repository<User>,
 	) {}
 
-	async create(createFileDto: CreateFileDto) {
-		console.log('createFileDto', createFileDto);
+	async create(createFileDto: CreateFileDto, user: User) {
+		const foundUser = await this.userRepository.findOne(user);
 		const file = this.fileRepository.create({
 			filename: createFileDto.filename,
 			level: createFileDto.level,
 			path: createFileDto.path,
+			user: foundUser,
 		});
 		return await this.fileRepository.save(file);
 	}
@@ -30,7 +31,8 @@ export class FilesService {
 	}
 
 	async findOne(id: number) {
-		return await this.fileRepository.findOne(id);
+		const file = await this.fileRepository.findOne(id);
+		return file;
 	}
 
 	async remove(id: number) {
