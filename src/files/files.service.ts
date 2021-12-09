@@ -31,8 +31,14 @@ export class FilesService {
 		return await this.fileRepository.save(file);
 	}
 
-	async findAll() {
-		return await this.fileRepository.find();
+	async findAll(level: number) {
+		return await this.fileRepository
+			.createQueryBuilder('file')
+			.leftJoinAndSelect('file.user', 'user')
+			.where('file.level <= :level', {
+				level: level,
+			})
+			.getMany();
 	}
 
 	async findOne(id: number) {
@@ -69,5 +75,19 @@ export class FilesService {
 		results = results.filter((item: any) => item.ocurrences > 0);
 
 		return results;
+	}
+
+	async byName(search: string, level: number) {
+		console.log('search', search);
+		const filteredFiles = await this.fileRepository
+			.createQueryBuilder('file')
+			.leftJoinAndSelect('file.user', 'user')
+			.where(`file.level <= :level and file.filename like :search`, {
+				level: level,
+				search: `%${search}%`,
+			})
+			.getMany();
+
+		return filteredFiles;
 	}
 }

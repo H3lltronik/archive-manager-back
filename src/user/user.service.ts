@@ -24,7 +24,7 @@ export class UserService {
 			username: dto.username,
 			password: hashedPass,
 			name: dto.name,
-			level: 3,
+			level: dto.level,
 		});
 
 		const { password, ...savedUser } = await this.userRepository.save(user);
@@ -61,7 +61,6 @@ export class UserService {
 
 	async addFile(id: number, user: User) {
 		const file = await this.fileRepository.findOne(id);
-		console.log('aber', user, file);
 		if (!file || !user) {
 			throw new HttpException('', HttpStatus.NOT_FOUND);
 		}

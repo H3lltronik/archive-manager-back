@@ -28,7 +28,7 @@ async function bootstrap() {
 		},
 	});
 	app.enableCors({
-		origin: 'http://192.168.100.3:3000',
+		origin: 'localhost:3000',
 		credentials: true,
 	});
 	await app.listen(4000);

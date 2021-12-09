@@ -12,6 +12,9 @@ import {
 	Request,
 	UseGuards,
 	Query,
+	HttpException,
+	HttpStatus,
+	Response,
 } from '@nestjs/common';
 import { FilesService } from './files.service';
 import { CreateFileDto } from './dto/create-file.dto';
@@ -28,11 +31,6 @@ const fs = require('fs');
 export class FilesController {
 	constructor(private readonly filesService: FilesService) {}
 
-	@Get('download')
-	download() {
-		return this.filesService.findAll();
-	}
-
 	@UseGuards(AuthenticatedGuard)
 	@Post()
 	create(@Request() req, @Body() createFileDto: CreateFileDto) {
@@ -42,14 +40,21 @@ export class FilesController {
 	@UseGuards(AuthenticatedGuard)
 	@Get('search')
 	search(@Request() req, @Query('search') search: string) {
-		console.log('search', search);
 		// if (search.length <= 0) return this.filesService.findAll();
 		return this.filesService.search(search, req.user.level);
 	}
 
-	@Get()
-	findAll() {
-		return this.filesService.findAll();
+	@UseGuards(AuthenticatedGuard)
+	@Get('byName')
+	byName(@Request() req, @Query('search') search: string) {
+		// if (search.length <= 0) return this.filesService.findAll();
+		return this.filesService.byName(search, req.user.level);
+	}
+
+	@UseGuards(AuthenticatedGuard)
+	@Get('getAll')
+	getAll(@Request() req) {
+		return this.filesService.findAll(req.user.level);
 	}
 
 	@Get(':id')
@@ -66,8 +71,12 @@ export class FilesController {
 	@Post('file-upload')
 	@UseInterceptors(FileInterceptor('file', FilesStorage.configuration()))
 	async uploadFile(@UploadedFile() file: Express.Multer.File, @Req() req) {
-		const filename = req.file.path;
-		const filenamePath = `${req.file.destination}${req.file.filename}`;
+		// const filename = req.file.path;
+		// const filenamePath = `${req.file.destination}${req.file.filename}`;
+		console.log('req.file', req.file);
+		if (!req.file) {
+			throw new HttpException('No file provided', HttpStatus.BAD_REQUEST);
+		}
 
 		return file;
 	}

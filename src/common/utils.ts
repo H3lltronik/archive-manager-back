@@ -28,9 +28,16 @@ export function indexes(source, find) {
 export async function searchInContents(search: string, pathToFile: string) {
 	const rootPath = path.resolve('./');
 	return new Promise<number[]>((resolve, reject) => {
-		reader.getText(path.resolve(rootPath, pathToFile)).then((data) => {
-			const searchResult = indexes(data, search);
-			resolve(searchResult);
-		});
+		try {
+			reader
+				.getText(path.resolve(rootPath, pathToFile))
+				.then((data) => {
+					const searchResult = indexes(data, search);
+					resolve(searchResult);
+				})
+				.catch((err) => resolve([]));
+		} catch (e) { // Hanlde unsupported files for the reader
+			resolve([]); // No results
+		}
 	});
 }

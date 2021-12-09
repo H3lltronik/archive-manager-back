@@ -14,4 +14,7 @@ export class CreateUserDto {
 	@IsNotEmpty()
 	@Match('password', { message: "Password confirmation doesn't match" })
 	confirmPassword: string;
+
+	@IsNotEmpty()
+	level: number;
 }
