@@ -62,6 +62,7 @@ export class FilesController {
 		return this.filesService.findOne(+id);
 	}
 
+	@UseGuards(AuthenticatedGuard)
 	@Delete(':id')
 	remove(@Param('id') id: string) {
 		return this.filesService.remove(+id);
@@ -71,9 +72,6 @@ export class FilesController {
 	@Post('file-upload')
 	@UseInterceptors(FileInterceptor('file', FilesStorage.configuration()))
 	async uploadFile(@UploadedFile() file: Express.Multer.File, @Req() req) {
-		// const filename = req.file.path;
-		// const filenamePath = `${req.file.destination}${req.file.filename}`;
-		console.log('req.file', req.file);
 		if (!req.file) {
 			throw new HttpException('No file provided', HttpStatus.BAD_REQUEST);
 		}

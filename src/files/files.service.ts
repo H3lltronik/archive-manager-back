@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+	HttpException,
+	HttpStatus,
+	Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { indexes, searchInContents } from 'src/common/utils';
 import { User } from 'src/user/entities/user.entity';
@@ -48,6 +52,17 @@ export class FilesService {
 
 	async remove(id: number) {
 		const file = await this.findOne(id);
+		if (!file)
+			throw new HttpException('File not found', HttpStatus.NOT_FOUND);
+		const filePath = './public/' + file.path;
+		if (fs.existsSync(filePath)) {
+			fs.unlink(filePath, (err) => {
+				if (err) {
+					console.error(err);
+					return;
+				}
+			});
+		}
 		return await this.fileRepository.remove(file);
 	}
 
@@ -78,7 +93,6 @@ export class FilesService {
 	}
 
 	async byName(search: string, level: number) {
-		console.log('search', search);
 		const filteredFiles = await this.fileRepository
 			.createQueryBuilder('file')
 			.leftJoinAndSelect('file.user', 'user')
