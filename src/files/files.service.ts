@@ -1,8 +1,4 @@
-import {
-	HttpException,
-	HttpStatus,
-	Injectable,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { indexes, searchInContents } from 'src/common/utils';
 import { User } from 'src/user/entities/user.entity';
@@ -102,6 +98,15 @@ export class FilesService {
 			})
 			.getMany();
 
-		return filteredFiles;
+		const filter2 = filteredFiles.filter((file) => {
+			return file.filename.search(search) != -1;
+		});
+		const filter3 = filter2.map((file) => {
+			const res: any = { ...file };
+			res.ocurrences = indexes(file.filename, search).length;
+			return res;
+		});
+
+		return filter3;
 	}
 }
