@@ -6,33 +6,31 @@ type Data = {
 	status: string | number;
 };
 type payload = {
-	fullName: string;
+	token: string;
 	email: string;
-	message: string;
 };
 
-export default async function sendContact(body: payload) {
+export default async function sendRecoverMail(body: payload) {
 	const transporter = nodemailer.createTransport({
+		service: 'gmail',
 		port: Number(process.env.MAILING_PORT),
 		host: process.env.MAILING_HOST,
 		auth: {
-			user: process.env.CONTACT_EMAIL,
-			pass: process.env.CONTACT_PASSWORD,
+			user: process.env.MAIL_EMAIL,
+			pass: process.env.MAIL_PASSWORD,
 		},
 		secure: true,
 	});
 
 	const mailData = {
-		from: process.env.CONTACT_EMAIL,
-		to: process.env.PERSONAL_EMAIL,
-		subject: `Mensaje de contacto del portafolio H3lltronik`,
+		from: process.env.APP_EMAIL,
+		to: body.email,
+		subject: `Tu recuperacion de contraseña`,
 		html: `
-            <div>Nombre: ${body.fullName}</div>
-            <div>Email: ${body.email}</div>
-            <div>Mensaje: ${body.message}</div>
+            <div>Haz click aqui: ${process.env.FRONTEND_URL}/${body.token}</div>
         `,
 	};
-	console.log('About to send the mail...');
+	console.log('About to send the mail...', body);
 	const result: Data = await new Promise((resolve, reject) => {
 		transporter.sendMail(mailData, function (err: any, info: any) {
 			if (err) {

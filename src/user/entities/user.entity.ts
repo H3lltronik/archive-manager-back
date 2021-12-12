@@ -1,4 +1,5 @@
 import { File } from 'src/files/entities/file.entity';
+import { Recover } from 'src/recover/entities/recover.entity';
 import {
 	Column,
 	Entity,
@@ -26,4 +27,7 @@ export class User {
 
 	@OneToMany(() => File, (file) => file.user)
 	files: File[];
+
+	@OneToMany(() => Recover, (recover) => recover.user)
+	recoverTokens: Recover[];
 }

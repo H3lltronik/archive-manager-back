@@ -59,6 +59,21 @@ export class UserService {
 		return user;
 	}
 
+	async update(id: number, dto: UpdateUserDto): Promise<User> {
+		const user = await this.userRepository.findOne(id);
+		if (!user)
+			throw new HttpException(
+				"User doesn't exists",
+				HttpStatus.NOT_FOUND,
+			);
+
+		const salt = await bcrypt.genSalt(10);
+		const hashedPass = await bcrypt.hash(dto.password, salt);
+
+		user.password = hashedPass;
+		return this.userRepository.save(user);
+	}
+
 	async addFile(id: number, user: User) {
 		const file = await this.fileRepository.findOne(id);
 		if (!file || !user) {
