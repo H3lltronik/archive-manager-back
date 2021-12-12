@@ -1,6 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { indexes, searchInContents } from 'src/common/utils';
+import {
+	getFileContents,
+	indexes,
+	searchInContents,
+	wordCount,
+} from 'src/common/utils';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateFileDto } from './dto/create-file.dto';
@@ -75,11 +80,17 @@ export class FilesService {
 			filteredFiles.map(async (file) => {
 				const item: any = {};
 				Object.assign(item, file);
-				const result = await searchInContents(
-					search,
-					`public/${file.path}`,
-				);
-				item.ocurrences = result.length;
+				const content = await getFileContents(`public/${file.path}`);
+				if (!content)
+					return {
+						ocurrences: 0,
+					};
+				const resultSearch = indexes(content, search);
+				const words = wordCount(content);
+
+				item.ocurrences = resultSearch.length;
+				item.words = words;
+				item.characters = content.length;
 				return item;
 			}),
 		);

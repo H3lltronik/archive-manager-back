@@ -31,8 +31,37 @@ export async function searchInContents(search: string, pathToFile: string) {
 					resolve(searchResult);
 				})
 				.catch((err) => resolve([]));
-		} catch (e) { // Hanlde unsupported files for the reader
+		} catch (e) {
+			// Hanlde unsupported files for the reader
 			resolve([]); // No results
 		}
 	});
+}
+
+export async function getFileContents(pathToFile: string) {
+	const rootPath = path.resolve('./');
+	return new Promise<string | null>((resolve, reject) => {
+		try {
+			reader
+				.getText(path.resolve(rootPath, pathToFile))
+				.then((data) => {
+					resolve(data);
+				})
+				.catch((err) => resolve(null));
+		} catch (e) {
+			resolve(null); // No results
+		}
+	});
+}
+
+export function wordCount(str: string) {
+	const stringArray = str.split(' ');
+	let count = 0;
+	for (let i = 0; i < stringArray.length; i++) {
+		const word = stringArray[i];
+		if (/[A-Za-z]/.test(word)) {
+			count++;
+		}
+	}
+	return count;
 }
